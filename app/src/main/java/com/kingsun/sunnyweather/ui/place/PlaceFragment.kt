@@ -1,6 +1,7 @@
 package com.kingsun.sunnyweather.ui.place
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +11,10 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.kingsun.sunnyweather.MainActivity
 import com.kingsun.sunnyweather.R
 import com.kingsun.sunnyweather.databinding.FragmentPlaceBinding
+import com.kingsun.sunnyweather.ui.weather.WeatherActivity
 
 class PlaceFragment : Fragment() {
     val viewModel by lazy { ViewModelProvider(this).get(PlaceViewModel::class.java) }
@@ -37,6 +40,20 @@ class PlaceFragment : Fragment() {
     )
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        // 如果缓存了地名，直接跳到天气界面
+        if (activity is MainActivity && viewModel.isPlaceSaved()){
+            val place = viewModel.getSavedPlace()
+            val intent = Intent(context, WeatherActivity::class.java).apply {
+                putExtra("location_lng",place.location.lng)
+                putExtra("location_lat",place.location.lat)
+                putExtra("place_name",place.name)
+            }
+            startActivity(intent)
+            activity?.finish()
+            return
+        }
+
         placeAdapter = PlaceAdapter(this,viewModel.placeList)
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)

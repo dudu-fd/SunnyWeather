@@ -13,6 +13,12 @@ object SunnyWeatherNetwork {
 
     suspend fun searchPlaces(query: String) = placeService.searchPlaces(query).await()
 
+    private val weatherService = ServiceCreator.create<WeatherService>()
+
+    suspend fun getDailyWeather(lng:String,lat:String) = weatherService.getDailyWeather(lng, lat).await()
+
+    suspend fun getRealtimeWeather(lng:String,lat:String) = weatherService.getRealtimeWeather(lng, lat).await()
+
     // 这种协程方式，在最新版的retrofit 已经实现，直接把接口请求写成 suspend ，返回对应实体即可，不用包装成 Call
     private suspend fun <T> Call<T>.await(): T {
         return suspendCoroutine { continuation ->
